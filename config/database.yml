@@ -1,0 +1,23 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV["DB_POOL"] || 5  %>
+  database: <%= ENV['DB_NAME'] || 'hwahae-api_development' %>
+  username: <%= ENV['DB_USER'] || ENV['USER'] %>
+  password: <%= ENV['DB_PASS'] %>
+  host: <%= ENV["DB_HOST"] %>
+  url: <%= ENV['DATABASE_URL'] %> # takes higher precedence than other settings
+  reconnect: true
+
+development:
+  <<: *default
+  database: <%= ENV['DB_NAME'] || 'hwahae-api_development' %>
+
+test:
+  <<: *default
+  database: hwahae-api_test
+
+production:
+  <<: *default
+  database: hwahae-api_production
+  url: <%= ENV['DATABASE_URL'] %>
