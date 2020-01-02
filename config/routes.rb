@@ -1,5 +1,7 @@
 Jets.application.routes.draw do
-  root "jets/public#show"
+  resources :products, only: [:index, :show]
+  # get 'products/index'
+  # get 'products/show'
 
   # The jets/public#show controller can serve static utf8 content out of the public folder.
   # Note, as part of the deploy process Jets uploads files in the public folder to s3
