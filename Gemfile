@@ -2,7 +2,10 @@ source "https://rubygems.org"
 
 gem "jets"
 
-
+gem 'pg', '0.21.0'
+gem 'rest-client'
+gem 'aws-record'
+gem 'aws-sdk'
 gem "dynomite"
 
 # development and test groups are not bundled as part of the deployment
