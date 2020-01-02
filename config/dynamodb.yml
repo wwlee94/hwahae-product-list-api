@@ -7,7 +7,8 @@ development:
   # More examples:
   # table_namespace: demo-dev
 
-  endpoint: http://localhost:8000 # comment out if want to test with real dynamodb
+  # DynamoDB를 이용하기 위한 엔드포인트 ( 모두 동일 )
+  endpoint: http://dynamodb.ap-northeast-2.amazonaws.com # comment out if want to test with real dynamodb
   # on AWS. You can also set the DYNAMODB_ENDPOINT environment variable.
   # You can also are actually deploying a development environment is to
   # change bin/server and export DYNAMODB_ENDPOINT=http://localhost:8000 at the top
@@ -20,3 +21,4 @@ test:
 
 production:
   table_namespace: <%= Jets.config.table_namespace %>
+  endpoint: http://dynamodb.ap-northeast-2.amazonaws.com
