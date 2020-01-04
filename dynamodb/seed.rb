@@ -10,7 +10,10 @@ dynamodb = Aws::DynamoDB::Resource.new(region: 'ap-northeast-2')
 table = dynamodb.table('hwahae-api-prod-products')
 
 product_list = CSV.parse(File.read('hwahae-items.csv'), headers: true)
+i = 0
 product_list.each do |product|
+    break if i>50
+    i+=1
     description = "";
     for i in 1..10
         break description += product['name'] if i == 10
@@ -18,10 +21,11 @@ product_list.each do |product|
     end
     table.put_item({
         item: {
+            stat: 'ok',
             image_id: product['image_id'],
             full_size_image: "#{full_size_image}/#{product['image_id']}.jpg",
             thumbnail_image: "#{thumbnail_image}/#{product['image_id']}.jpg",
-            name: product['name'],
+            title: product['name'],
             price: product['price'],
             description: description,
             oily_score: rand(0..100),
