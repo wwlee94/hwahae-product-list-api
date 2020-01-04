@@ -1,6 +1,6 @@
-class CreateProductMigration < Dynomite::Migration
+class CreateProductsMigration < Dynomite::Migration
   def up
-    create_table :product do |t|
+    create_table :products do |t|
       t.partition_key "image_id:string" # required
       t.sort_key "name:string"
       t.provisioned_throughput(5) # sets both read and write, defaults to 5 when not set

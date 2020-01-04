@@ -7,11 +7,9 @@ full_size_image = "#{GREPP_S3_URL}/image"
 thumbnail_image = "#{GREPP_S3_URL}/thumbnail"
 
 dynamodb = Aws::DynamoDB::Resource.new(region: 'ap-northeast-2')
-table = dynamodb.table('hwahae-api-dev-product')
-
+table = dynamodb.table('hwahae-api-prod-products')
 
 product_list = CSV.parse(File.read('hwahae-items.csv'), headers: true)
-i = 0
 product_list.each do |product|
     description = "";
     for i in 1..10

@@ -1,6 +1,6 @@
 class Product < ApplicationItem
     partition_key "image_id"
-    column :name, :price, :url
+    column :name, :price, :full_size_image, :thumbnail_image, :description, :oily_score, :dry_score, :sensitive_score
     # include Aws::Record
     # integer_attr :id , range_key: true
     # string_attr :stat , hash_key: true 

@@ -1,6 +1,6 @@
 require 'aws-sdk'
 dynamodb = Aws::DynamoDB::Resource.new(region: 'ap-northeast-2')
-table = dynamodb.table('hwahae-api-dev-product')
+table = dynamodb.table('hwahae-api-prod-products')
 
 scan_output = table.scan({
   limit: 5,
