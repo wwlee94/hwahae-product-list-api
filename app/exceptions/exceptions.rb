@@ -37,6 +37,18 @@ module Exceptions
     end
   end
 
+  class ValidatePageParameter < NotFound
+    def message
+      "ValidatePageParameter - page 요청 변수는 숫자 타입 요청만 가능합니다 !"
+    end
+  end
+
+  class ValidateSkinTypeParameter < NotFound
+    def message
+      "ValidateSkinTypeParameter - skin_type은 ['oily', 'dry', 'sensitive'] 요청만 가능합니다 !"
+    end
+  end
+
   class PageOverRequest < NotFound
     def message
       "PageOverRequest - 요청 페이지를 초과 했습니다!"

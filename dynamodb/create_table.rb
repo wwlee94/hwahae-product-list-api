@@ -10,6 +10,10 @@ resp = client.create_table({
       attribute_type: "S", # required, accepts S, N, B
     },
     {
+      attribute_name: "image_id", # required
+      attribute_type: "S", # required, accepts S, N, B
+    },
+    {
       attribute_name: "oily_score", # required
       attribute_type: "N", # required, accepts S, N, B
     },
@@ -28,11 +32,27 @@ resp = client.create_table({
       key_type: "HASH", # required, accepts HASH, RANGE
     },
     {
-      attribute_name: "oily_score", # required
+      attribute_name: "image_id", # required
       key_type: "RANGE", # required, accepts HASH, RANGE
     },
   ],
   local_secondary_indexes: [
+    {
+        index_name: "oily_score_index", # required
+        key_schema: [ # required
+          {
+            attribute_name: "stat", # required
+            key_type: "HASH", # required, accepts HASH, RANGE
+          },
+          {
+            attribute_name: "oily_score", # required
+            key_type: "RANGE", # required, accepts HASH, RANGE
+          },
+        ],
+        projection: { # required
+          projection_type: "ALL" # accepts ALL, KEYS_ONLY, INCLUDE
+        },
+    },
     {
       index_name: "dry_score_index", # required
       key_schema: [ # required
