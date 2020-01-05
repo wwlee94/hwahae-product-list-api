@@ -10,11 +10,11 @@ class ProductsController < ApplicationController
   # GET /products
   def index
     param = {
-      key_condition_expression: "stat = :stat",
+      key_condition_expression: 'stat = :stat',
       expression_attribute_values: {
-          ":stat" => "ok"
+          ':stat' => 'ok'
       },
-      projection_expression: "image_id, thumbnail_image, title, price",
+      projection_expression: 'image_id, thumbnail_image, title, price',
       scan_index_forward: false, # false면 내림차순, true면 오름차순
       limit: 20
     }
@@ -37,15 +37,44 @@ class ProductsController < ApplicationController
     else
       raise Exceptions::ValidateSkinTypeParameter
     end
-  
+
+    if !params[:search].nil?
+      
+    end
+
+    loop_count = 1
     # 페이지 변수가 있을 때
     if params[:page]
       raise Exceptions::ValidatePageParameter unless is_number? params[:page]
 
-      render json: '페이지 변수 존재'
+      page_no = params[:page].to_i
+      raise Exceptions::PageUnderRequest if page_no <= 0
 
-      # page_no = params[:page].to_i
-      # raise Exceptions::PageUnderRequest if page_no <= 0
+      begin
+        loop do
+            @products = @dynamodb.query(param)
+            puts "Scanning for more... page = #{loop_count}"
+
+            break if @products.last_evaluated_key.nil? or (loop_count == page_no)
+
+            param[:exclusive_start_key] = @products.last_evaluated_key
+            loop_count += 1
+        end
+        puts @products.items
+        puts @products.last_evaluated_key
+        puts @products.items.length
+        puts "요청된 페이지 = #{page_no}, 확인된 페이지 #{loop_count}"
+        response = { 
+          statusCode: 200,
+          body: @products.items,
+          scanned_count: @products.items.length,
+          page: loop_count
+        }
+      rescue Aws::DynamoDB::Errors::ServiceError => error
+        response = { statusCode: 500, body: "#{e.message}" }
+      end
+
+      render json: JSON.pretty_generate(response)
 
       # start_id = (params[:page].to_i - 1) * 50
 
@@ -81,7 +110,12 @@ class ProductsController < ApplicationController
           skin_type_score = "#{params[:skin_type] || 'oily'}_score"
           item[skin_type_score] = item[skin_type_score].to_i
         end
-        response = { statusCode: 200, body: products.items, scanned_count: products.items.length }
+        response = { 
+          statusCode: 200,
+          body: products.items,
+          scanned_count: products.items.length,
+          page: loop_count
+        }
       rescue Aws::DynamoDB::Errors::ServiceError => e
         response = { statusCode: 500, body: "#{e.message}" }
       end
@@ -106,7 +140,7 @@ class ProductsController < ApplicationController
   private
     # Only allow a trusted parameter "white list" through.
     def product_params
-      params.require(:product).permit(:image_id, :title, :price, :full_size_image, :thumbnail_image, :description, :oily_score, :dry_score, :sensitive_score, :page, :skin_type)
+      params.require(:product).permit(:image_id, :title, :price, :full_size_image, :thumbnail_image, :description, :oily_score, :dry_score, :sensitive_score, :page, :skin_type, :search)
     end
 
     def set_dynamodb
@@ -117,11 +151,11 @@ class ProductsController < ApplicationController
     # 상세 정보
     def set_product_details
       param = {
-        projection_expression: "image_id, full_size_image, title, description, price, oily_score, dry_score, sensitive_score",
-        key_condition_expression: "stat = :stat and image_id = :id",
+        projection_expression: 'image_id, full_size_image, title, description, price, oily_score, dry_score, sensitive_score',
+        key_condition_expression: 'stat = :stat and image_id = :id',
         expression_attribute_values: {
-          ":stat" => "ok",
-          ":id" => params[:id]
+          ':stat' => 'ok',
+          ':id' => params[:id]
         }
       }
       begin

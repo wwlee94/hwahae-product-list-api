@@ -2,45 +2,73 @@ require 'aws-sdk'
 dynamodb = Aws::DynamoDB::Resource.new(region: 'ap-northeast-2')
 table = dynamodb.table('hwahae-api-prod-products')
 
-page = 50
+# index sort & filter 
+page = 2
+filter = '10'
 
 params = {
     index_name: 'dry_score_index',
-    key_condition_expression: "stat = :stat",
+    key_condition_expression: 'stat = :stat',
+    filter_expression: 'contains (title, :word)',
     expression_attribute_values: {
-        ":stat" => "ok"
+        ':stat' => 'ok',
+        ':word' => filter
     },
-    projection_expression: "image_id, full_size_image, title, price, oily_score, dry_score, sensitive_score",
+    projection_expression: 'image_id, full_size_image, title, price, oily_score, dry_score, sensitive_score',
     scan_index_forward: false, # false면 내림차순, true면 오름차순
-    limit: 20
+    # limit: 20
 }
 
-loop_count = 1
 begin
-    loop do
-        # index dry_score desc
-        @products = table.query(params)
+    # index dry_score desc
+    @products = table.query(params)
 
-        # products.items.each{ |product|
-        #     puts "#{product["title"].to_i}"
-        # }
-
-        puts "Scanning for more... page = #{loop_count}"
-
-        break if @products.last_evaluated_key.nil? or (loop_count == page)
-
-        params[:exclusive_start_key] = @products.last_evaluated_key
-        loop_count += 1
-    end
-    puts @products.items
-    puts @products.last_evaluated_key
-    puts @products.items.length
-    puts "요청된 페이지 = #{page}, 확인된 페이지 #{loop_count}"
+    @products = @products.items.slice((page-1)*20, 20)
+    puts @products
+    puts @products.length
+    puts "요청된 페이지 = #{page}"
     
 rescue  Aws::DynamoDB::Errors::ServiceError => error
     puts "Unable to scan:"
     puts "#{error.message}"
 end
+
+# # 페이징, index sorting
+# page = 50
+
+# params = {
+#     index_name: 'dry_score_index',
+#     key_condition_expression: "stat = :stat",
+#     expression_attribute_values: {
+#         ":stat" => "ok"
+#     },
+#     projection_expression: "image_id, full_size_image, title, price, oily_score, dry_score, sensitive_score",
+#     scan_index_forward: false, # false면 내림차순, true면 오름차순
+#     limit: 20
+# }
+
+# loop_count = 1
+# begin
+#     loop do
+#         # index dry_score desc
+#         @products = table.query(params)
+
+#         puts "Scanning for more... page = #{loop_count}"
+
+#         break if @products.last_evaluated_key.nil? or (loop_count == page)
+
+#         params[:exclusive_start_key] = @products.last_evaluated_key
+#         loop_count += 1
+#     end
+#     puts @products.items
+#     puts @products.last_evaluated_key
+#     puts @products.items.length
+#     puts "요청된 페이지 = #{page}, 확인된 페이지 #{loop_count}"
+    
+# rescue  Aws::DynamoDB::Errors::ServiceError => error
+#     puts "Unable to scan:"
+#     puts "#{error.message}"
+# end
 
 # index (oily_score asc)
 # products = table.scan({
