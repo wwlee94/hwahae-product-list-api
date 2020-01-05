@@ -16,7 +16,7 @@ class ProductsController < ApplicationController
       },
       projection_expression: 'image_id, thumbnail_image, title, price',
       scan_index_forward: false, # false면 내림차순, true면 오름차순
-      limit: 20
+      # limit: 20
     }
 
     raise Exceptions::ValidateSkinTypeParameter if is_number? params[:skin_type]
@@ -38,11 +38,12 @@ class ProductsController < ApplicationController
       raise Exceptions::ValidateSkinTypeParameter
     end
 
+    # 검색
     if !params[:search].nil?
-      
+      param[:expression_attribute_values].merge!(':word'=> params[:search])
+      param[:filter_expression] = "contains (title, :word)"
     end
 
-    loop_count = 1
     # 페이지 변수가 있을 때
     if params[:page]
       raise Exceptions::ValidatePageParameter unless is_number? params[:page]
@@ -51,70 +52,40 @@ class ProductsController < ApplicationController
       raise Exceptions::PageUnderRequest if page_no <= 0
 
       begin
-        loop do
-            @products = @dynamodb.query(param)
-            puts "Scanning for more... page = #{loop_count}"
+        @products = @dynamodb.query(param)
+        @products = @products.items.slice((page_no-1) * 20, 20)
+        raise Exceptions::PageOverRequest if @products.blank?
 
-            break if @products.last_evaluated_key.nil? or (loop_count == page_no)
-
-            param[:exclusive_start_key] = @products.last_evaluated_key
-            loop_count += 1
+        @products.each do |item| 
+          skin_type_score = "#{params[:skin_type] || 'oily'}_score"
+          item[skin_type_score] = item[skin_type_score].to_i
         end
-        puts @products.items
-        puts @products.last_evaluated_key
-        puts @products.items.length
-        puts "요청된 페이지 = #{page_no}, 확인된 페이지 #{loop_count}"
+
         response = { 
           statusCode: 200,
-          body: @products.items,
-          scanned_count: @products.items.length,
-          page: loop_count
+          body: @products,
+          scanned_count: @products.length
         }
-      rescue Aws::DynamoDB::Errors::ServiceError => error
+      rescue Aws::DynamoDB::Errors::ServiceError => e
         response = { statusCode: 500, body: "#{e.message}" }
       end
 
       render json: JSON.pretty_generate(response)
-
-      # start_id = (params[:page].to_i - 1) * 50
-
-      # puts('Searching for more ...')
-
-      # param[:exclusive_start_key] = {
-      #   id: start_id,
-      #   stat: "ok"
-      # }
-
-      # begin
-      #   @products = dynamodb.query(param)
-      #   puts @products.items
-      #   puts @products.last_evaluated_key
-      #   raise Exceptions::PageOverRequest if @products.items.blank?
-      #   @products.items.each do |item|
-      #     str_int = item['id']
-      #     item['id'] = str_int.to_i
-      #   end
-      #   response = { statusCode: 200, body: @products.items }
-      # rescue Aws::DynamoDB::Errors::ServiceError => e
-      #   response = { statusCode: 500, body: "#{e.message}" }
-      # end
-
-      # raise Exceptions::InternalServerError if response.nil?
-
-      # render json: JSON.pretty_generate(response)
     else
       # 페이지 변수 없을 때 기본 데이터(20개)만 보여줌
       begin
         products = @dynamodb.query(param)
-        products.items.each do |item| 
+        products = products.items.slice(0, 20)
+        raise Exceptions::PageOverRequest if products.blank?
+
+        products.each do |item| 
           skin_type_score = "#{params[:skin_type] || 'oily'}_score"
           item[skin_type_score] = item[skin_type_score].to_i
         end
         response = { 
           statusCode: 200,
-          body: products.items,
-          scanned_count: products.items.length,
-          page: loop_count
+          body: products,
+          scanned_count: products.length
         }
       rescue Aws::DynamoDB::Errors::ServiceError => e
         response = { statusCode: 500, body: "#{e.message}" }

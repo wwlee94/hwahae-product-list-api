@@ -1,6 +1,15 @@
 Jets.application.configure do
   config.project_name = "hwahae-api"
   config.mode = "api"
+  
+  config.iam_policy = [
+    Jets::Application.default_iam_policy,
+    {
+      action: ['dynamodb:*'],
+      effect: 'Allow',
+      resource: "arn:aws:dynamodb:#{Jets.aws.region}:#{Jets.aws.account}:table/#{Jets.project_namespace}-*"
+    }
+  ]
 
   config.prewarm.enable = false # default is true
   # config.prewarm.rate = '30 minutes' # default is '30 minutes'
