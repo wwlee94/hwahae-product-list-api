@@ -37,13 +37,13 @@ module Exceptions
     end
   end
 
-  class ValidatePageParameter < NotFound
+  class ValidatePageParameter < BadRequest
     def message
       "ValidatePageParameter - page 요청 변수는 숫자 타입 요청만 가능합니다 !"
     end
   end
 
-  class ValidateSkinTypeParameter < NotFound
+  class ValidateSkinTypeParameter < BadRequest
     def message
       "ValidateSkinTypeParameter - skin_type은 ['oily', 'dry', 'sensitive'] 요청만 가능합니다 !"
     end

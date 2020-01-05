@@ -12,10 +12,7 @@ table = dynamodb.table('hwahae-api-prod-products')
 product_list = CSV.parse(File.read('hwahae-items.csv'), headers: true)
 $id
 id = 1
-count = 0
 product_list.each do |product|
-    break if count>50
-    count+=1
     description = "";
     for i in 1..10
         break description += product['name'] if i == 10
