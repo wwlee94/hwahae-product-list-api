@@ -14,7 +14,7 @@ params = {
         ':stat' => 'ok',
         ':word' => filter
     },
-    projection_expression: 'image_id, full_size_image, title, price, oily_score, dry_score, sensitive_score',
+    projection_expression: 'id, full_size_image, title, price, oily_score, dry_score, sensitive_score',
     scan_index_forward: false, # false면 내림차순, true면 오름차순
     # limit: 20
 }
@@ -42,7 +42,7 @@ end
 #     expression_attribute_values: {
 #         ":stat" => "ok"
 #     },
-#     projection_expression: "image_id, full_size_image, title, price, oily_score, dry_score, sensitive_score",
+#     projection_expression: "id, full_size_image, title, price, oily_score, dry_score, sensitive_score",
 #     scan_index_forward: false, # false면 내림차순, true면 오름차순
 #     limit: 20
 # }
@@ -72,7 +72,7 @@ end
 
 # index (oily_score asc)
 # products = table.scan({
-#     projection_expression: "image_id, full_size_image, title, price, oily_score, dry_score, sensitive_score",
+#     projection_expression: "id, full_size_image, title, price, oily_score, dry_score, sensitive_score",
 #     limit: 20
 # })
 
@@ -81,7 +81,7 @@ end
 # # show
 # products = table.query({
 #     select: "ALL_ATTRIBUTES",
-#     key_condition_expression: "image_id = :id",
+#     key_condition_expression: "id = :id",
 #     expression_attribute_values: {
 #         ":id" => '0086db38-46ed-4d9f-9cb0-1acbb1f5aa48'
 #     }

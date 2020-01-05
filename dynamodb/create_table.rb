@@ -10,8 +10,8 @@ resp = client.create_table({
       attribute_type: "S", # required, accepts S, N, B
     },
     {
-      attribute_name: "image_id", # required
-      attribute_type: "S", # required, accepts S, N, B
+      attribute_name: "id", # required
+      attribute_type: "N", # required, accepts S, N, B
     },
     {
       attribute_name: "oily_score", # required
@@ -32,7 +32,7 @@ resp = client.create_table({
       key_type: "HASH", # required, accepts HASH, RANGE
     },
     {
-      attribute_name: "image_id", # required
+      attribute_name: "id", # required
       key_type: "RANGE", # required, accepts HASH, RANGE
     },
   ],

@@ -14,7 +14,7 @@ class ProductsController < ApplicationController
       expression_attribute_values: {
           ':stat' => 'ok'
       },
-      projection_expression: 'image_id, thumbnail_image, title, price',
+      projection_expression: 'id, thumbnail_image, title, price',
       scan_index_forward: false, # false면 내림차순, true면 오름차순
       # limit: 20
     }
@@ -53,12 +53,14 @@ class ProductsController < ApplicationController
 
       begin
         @products = @dynamodb.query(param)
+        raise Exceptions::ProductNotFound if @products.items.blank?
         @products = @products.items.slice((page_no-1) * 20, 20)
         raise Exceptions::PageOverRequest if @products.blank?
 
         @products.each do |item| 
           skin_type_score = "#{params[:skin_type] || 'oily'}_score"
           item[skin_type_score] = item[skin_type_score].to_i
+          item['id'] = item['id'].to_i
         end
 
         response = { 
@@ -75,12 +77,14 @@ class ProductsController < ApplicationController
       # 페이지 변수 없을 때 기본 데이터(20개)만 보여줌
       begin
         products = @dynamodb.query(param)
+        raise Exceptions::ProductNotFound if products.items.blank?
         products = products.items.slice(0, 20)
         raise Exceptions::PageOverRequest if products.blank?
 
         products.each do |item| 
           skin_type_score = "#{params[:skin_type] || 'oily'}_score"
           item[skin_type_score] = item[skin_type_score].to_i
+          item['id'] = item['id'].to_i
         end
         response = { 
           statusCode: 200,
@@ -101,9 +105,9 @@ class ProductsController < ApplicationController
   # GET /products/1
   def show
     raise Exceptions::ProductNotFound if @product.items.blank?
-    @product.items[0]['oily_score'] = @product.items[0]['oily_score'].to_i
-    @product.items[0]['dry_score'] = @product.items[0]['dry_score'].to_i
-    @product.items[0]['sensitive_score'] = @product.items[0]['sensitive_score'].to_i
+    ['id', 'oily_score', 'dry_score', 'sensitive_score'].each do |col|
+      @product.items[0][col] = @product.items[0][col].to_i  
+    end
     response = { statusCode: 200, body: @product.items[0] }
     render json: JSON.pretty_generate(response);
   end
@@ -111,7 +115,7 @@ class ProductsController < ApplicationController
   private
     # Only allow a trusted parameter "white list" through.
     def product_params
-      params.require(:product).permit(:image_id, :title, :price, :full_size_image, :thumbnail_image, :description, :oily_score, :dry_score, :sensitive_score, :page, :skin_type, :search)
+      params.require(:product).permit(:id, :title, :price, :full_size_image, :thumbnail_image, :description, :oily_score, :dry_score, :sensitive_score, :page, :skin_type, :search)
     end
 
     def set_dynamodb
@@ -121,12 +125,13 @@ class ProductsController < ApplicationController
 
     # 상세 정보
     def set_product_details
+      raise Exceptions::ParameterIsNotInteger unless is_number? params[:id]
       param = {
-        projection_expression: 'image_id, full_size_image, title, description, price, oily_score, dry_score, sensitive_score',
-        key_condition_expression: 'stat = :stat and image_id = :id',
+        projection_expression: 'id, full_size_image, title, description, price, oily_score, dry_score, sensitive_score',
+        key_condition_expression: 'stat = :stat and id = :id',
         expression_attribute_values: {
           ':stat' => 'ok',
-          ':id' => params[:id]
+          ':id' => params[:id].to_i
         }
       }
       begin
