@@ -1,4 +1,8 @@
-# 상품 목록 조회 API - 필터, 검색, 페이징 기능
+# 화해 상품 목록 조회 API 
+```
+1. 상품 목록을 skin_type에 따라 조회 하거나 특정 Title을 기준으로 검색하며 페이징할 수 있는 API
+2. 상품 코드에 따른 상세 정보 조회도 가능합니다.
+```
 ## API Reference
 
 ### BASE URL
@@ -120,14 +124,8 @@ https://6uqljnm1pb.execute-api.ap-northeast-2.amazonaws.com/prod/products/250
 | Status Code               | Description                                       |
 |---------------------------|---------------------------------------------------|
 | 200 OK                    | 성공                                              |
-| 400 Bad Request           | 클라이언트 요청 오류 - page, id 요청 변수가 Integer 타입이 아닐 때, skin_type이 형식에 맞지 않을 때 |
+| 400 Bad Request           | 클라이언트 요청 오류 - page, id 요청 변수가 Integer 형식이 아닐 때, skin_type이 형식에 맞지 않을 때 |
 | 404 NotFound              | 조회한 데이터가 비어있을 때, URL 경로, HTTP method 오류로 페이지를 찾을 수 없을 때 |
 | 500 Internal Server Error | 서버에 문제가 있을 경우                           |
 
 ---
-
-## 전반적인 구현과 관련한 요청 사항
-- 테스트 코드를 작성하는 경우 가산점이 있습니다.
-- 프로젝트 구조 및 성능: 사용하는 프레임워크의 Best practice를 활용해서 프로젝트를 구성해 주세요.
-- 기능성: 버그 없이 기능이 정상적으로 동작해야 합니다.
-- 코딩 스타일: 다른 사람이 읽기 쉽고, 디버그하기 쉽도록 Clean한 코딩 스타일을 유지해 주세요.
