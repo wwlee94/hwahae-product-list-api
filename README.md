@@ -33,7 +33,7 @@ Content-Type: application/json
 #### QueryParameter
 | Parameter | Type   | Description |
 |----------------|--------|-------------|
-| skin_type      | String | (선택) 피부 타입 - Default: oily |
+| skin_type      | String | (선택) 피부 타입 [Default: oily] |
 | page           | Integer | (선택) 페이지 번호 |
 | search           | String | (선택) 검색 키워드 |
 
@@ -42,6 +42,8 @@ Content-Type: application/json
 1. curl -G https://6uqljnm1pb.execute-api.ap-northeast-2.amazonaws.com/prod/products -H "Content-Type: application/json"
 
 curl -G https://6uqljnm1pb.execute-api.ap-northeast-2.amazonaws.com/prod/products?skin_type=oily&page=10 -H "Content-Type: application/json"
+
+curl -G https://6uqljnm1pb.execute-api.ap-northeast-2.amazonaws.com/prod/products?skin_type=dry&search=프랑스 -H "Content-Type: application/json"
 
 2. 웹 브라우저에서 테스트
 https://6uqljnm1pb.execute-api.ap-northeast-2.amazonaws.com/prod/products?skin_type=oily&page=10
@@ -127,5 +129,3 @@ https://6uqljnm1pb.execute-api.ap-northeast-2.amazonaws.com/prod/products/250
 | 400 Bad Request           | 클라이언트 요청 오류 - page, id 요청 변수가 Integer 형식이 아닐 때, skin_type이 형식에 맞지 않을 때 |
 | 404 NotFound              | 조회한 데이터가 비어있을 때, URL 경로, HTTP method 오류로 페이지를 찾을 수 없을 때 |
 | 500 Internal Server Error | 서버에 문제가 있을 경우                           |
-
----
