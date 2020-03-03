@@ -962,9 +962,6 @@ GEM
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.7.5)
-    dotenv-rails (2.7.5)
-      dotenv (= 2.7.5)
-      railties (>= 3.2, < 6.1)
     dynomite (1.2.5)
       activesupport
       aws-sdk-dynamodb
@@ -1040,7 +1037,7 @@ GEM
     minitest (5.13.0)
     netrc (0.11.0)
     nio4r (2.5.2)
-    nokogiri (1.10.7)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     pg (0.21.0)
     public_suffix (4.0.2)
@@ -1104,7 +1101,6 @@ DEPENDENCIES
   aws-sdk
   byebug
   capybara
-  dotenv-rails
   dynomite
   jets
   launchy
