@@ -5,9 +5,7 @@
 ```
 ## API Reference
 
-### BASE URL
-- https://6uqljnm1pb.execute-api.ap-northeast-2.amazonaws.com/prod
-
+### BASE URL (Deprecated !)
     > BASE URL 뒤에 원하는 리소스를 붙혀 사용합니다.  
     ex) {BASE URL}/products?skin_type=oily&page=5
 
